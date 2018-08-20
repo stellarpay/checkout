@@ -39,6 +39,7 @@ var app = new Vue({
     message : '',
     countDownMessage : '',
     fetchOrder : {},
+    api_server : 'https://api.stellarpay.io',
   },
   created(){
     var prefix = this.$root
@@ -48,7 +49,7 @@ var app = new Vue({
     prefix.payment.description = url.searchParams.get("description");
     this.$root.payment.amount = url.searchParams.get("amount");
     prefix.payment.sum = prefix.payment.amount + prefix.payment.fee
-    axios.get('https://api.stellarpay.io/api/'+'merchantDetails/'+merchant).then(response => {
+    axios.get(prefix.api_server+'/api/merchantDetails/'+merchant).then(response => {
         this.$root.merchant.name = response.data.result[0].merchantLabel
         this.$root.merchant.id = response.data.result[0].merchantId
         this.$root.merchant.image = response.data.result[0].merchantLogo
@@ -64,21 +65,6 @@ var app = new Vue({
     });
   },
   methods: {
-    login_account(){
-    app.error = ''
-    app.message = ''
-    var params = new URLSearchParams();
-    params.append('username', app.login.username);
-    params.append('password', app.login.password);
-      axios.post('/api/login', params).then(function (response){
-          if(response.data.result == 0){
-              app.error = response.data.error
-          } else {
-              app.logged = 1
-              app.user = response.data.user
-          }
-      })
-    },
     selectAsset(asset){
       $(".generated_icon").click(function(){
           $(".generated_icon").removeClass("active");
@@ -100,7 +86,7 @@ var app = new Vue({
         if(prefix.active_currency.code == 'XLM' || prefix.active_currency.code == ''){
           prefix.active_currency.code = 'native'
         }
-        axios.get('https://api.stellarpay.io/api/gateway' , { params: { key: prefix.merchant.id, amount : prefix.payment.amount, currency : prefix.active_currency.code } }).then(response => {
+        axios.get(prefix.api_server+'/api/gateway/' , { params: { key: prefix.merchant.id, amount : prefix.payment.amount, currency : prefix.active_currency.code, description : prefix.payment.description } }).then(response => {
               this.$root.order = response.data
               this.$root.step = 'order'
               var minutes = 60 * 5,
@@ -140,7 +126,7 @@ var app = new Vue({
     },
     checkOrder(){
           var prefix = this.$root
-      axios.get('https://api.stellarpay.io/api/'+'orderDetails/'+this.$root.order.orderId).then(response => {
+      axios.get(prefix.api_server+'/api/orderDetails/'+this.$root.order.orderId).then(response => {
             prefix.fetchOrder = response.data.result[0]
             if(prefix.fetchOrder.isExpired == true && prefix.fetchOrder.orderStatus == false){
               prefix.countDownMessage = 'expired'
