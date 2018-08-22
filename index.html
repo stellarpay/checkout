@@ -103,11 +103,13 @@
                         <center>
                         <h3 style="font-size:20px" v-show="active_currency.code == 'native'">To pay send {{ (order.orderAmount) }} XLM to the address below</h3>
                         <h3 style="font-size:20px" v-show="active_currency.code != 'native'">To pay send {{ (order.orderAmount) }} {{ active_currency.code }} to the address below</h3>
+                        <button type="button" :data-clipboard-text="order.paymentAddress" class="btn btn-default copy" style="margin-top:0"><i class="fa fa-copy"></i></button>
                         <div class="publicButton">{{ order.paymentAddress }}
                         </div>
                         <br>
                         <small v-if="active_currency.code != 'native'">*Issuer of {{ active_currency.code }} : <b>[{{ shortIt(active_currency.issuer,15) }}]<b><br><br></small>
                         <h3 style="font-size:20px">with MEMO Text</h3>
+                        <button type="button" :data-clipboard-text="order.memo" class="btn btn-default copy" style="margin-top:0"><i class="fa fa-copy"></i></button>
                           <div class="publicButton">{{ order.memo }}
                           </div>
                         </p></center>
@@ -172,7 +174,7 @@
 <script src="assets/js/gateway.js"></script>
 <script src="assets/js/clipboard.min.js"></script>
 <script type="text/javascript">
-      new Clipboard('.publicButton');
+      new Clipboard('.btn-default');
       $(function(){
           $('[data-toggle="tooltip"]').tooltip();
       });
