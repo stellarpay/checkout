@@ -39,6 +39,7 @@ var app = new Vue({
     message : '',
     countDownMessage : '',
     fetchOrder : {},
+    shopifyOrderId : '',
     api_server : 'https://api.stellarpay.io',
   },
   created(){
@@ -48,6 +49,7 @@ var app = new Vue({
     var merchant = url.searchParams.get("merchant");
     prefix.payment.description = url.searchParams.get("description");
     this.$root.payment.amount = url.searchParams.get("amount");
+    prefix.shopifyOrderId = url.searchParams.get("order_id");
     prefix.payment.sum = prefix.payment.amount + prefix.payment.fee
     axios.get(prefix.api_server+'/api/merchantDetails/'+merchant).then(response => {
         this.$root.merchant.name = response.data.result[0].merchantLabel
@@ -57,6 +59,8 @@ var app = new Vue({
         this.$root.merchant.cancel = response.data.result[0].cancelUrl
         this.$root.merchant.acceptedCurrencies = JSON.parse(response.data.result[0].acceptedCurrencies)
         })
+
+    this.checkShopifyStatus();
   },
   mounted(){
     $(".generated_icon").click(function(){
@@ -86,16 +90,20 @@ var app = new Vue({
         if(prefix.active_currency.code == 'XLM' || prefix.active_currency.code == ''){
           prefix.active_currency.code = 'native'
         }
-        axios.get(prefix.api_server+'/api/gateway/' , { params: { key: prefix.merchant.id, amount : prefix.payment.amount, currency : prefix.active_currency.code, description : prefix.payment.description } }).then(response => {
-              this.$root.order = response.data
-              this.$root.step = 'order'
-              var minutes = 60 * 60,
-              display = document.querySelector('#time');
-              this.countDown(minutes, display);
-              if(prefix.countDownMessage == ''){
-                window.setInterval(() => {
-                  this.checkOrder()
-              }, 7500);
+        axios.get(prefix.api_server+'/api/shopify_gateway/' , { params: { key: prefix.merchant.id, description : prefix.payment.description, currency : prefix.active_currency.code, order_id : prefix.shopifyOrderId } }).then(response => {
+              if(response.data.error == 'Invalid Request!'){
+                this.$root.error = 'Invalid payment request. You need to create new order from merchant`s site!'
+              } else {
+                this.$root.order = response.data
+                this.$root.step = 'order'
+                var minutes = 60 * 60,
+                display = document.querySelector('#time');
+                this.countDown(minutes, display);
+                if(prefix.countDownMessage == ''){
+                  window.setInterval(() => {
+                    this.checkOrder()
+                }, 7500);
+                }
               }
             })
     },
@@ -124,9 +132,22 @@ var app = new Vue({
       var result = string.substring(0, maxLength) + '...';
       return result
     },
+    checkShopifyStatus(){
+          var prefix = this.$root
+      axios.get(prefix.api_server+'/api/isProcessedOnShopify/'+prefix.shopifyOrderId).then(response => {
+            prefix.fetchOrder = response.data.result[0]
+            if(prefix.fetchOrder.isExpired == true && prefix.fetchOrder.orderStatus == false){
+              prefix.countDownMessage = 'expired'
+            } else if (prefix.fetchOrder.orderStatus == true){
+              prefix.countDownMessage = 'paid'
+            } else {
+              console.log('Waiting for payment')
+            }
+          })
+    },
     checkOrder(){
           var prefix = this.$root
-      axios.get(prefix.api_server+'/api/orderDetails/'+this.$root.order.orderId).then(response => {
+      axios.get(prefix.api_server+'/api/isProcessedOnShopify/'+prefix.shopifyOrderId).then(response => {
             prefix.fetchOrder = response.data.result[0]
             if(prefix.fetchOrder.isExpired == true && prefix.fetchOrder.orderStatus == false){
               prefix.countDownMessage = 'expired'

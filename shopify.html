@@ -27,7 +27,7 @@
                         <section class="payment-form dark" style="border-radius:5px">
                             <br>
                             <center>
-                                <img v-bind:src="merchant.image" style="width:110px">
+                                <img v-bind:src="merchant.image" style="width:160px">
                                 </br>
                                 </br>Payment to <b>{{ merchant.name }}</b>
                             </center>
@@ -39,17 +39,17 @@
                                         <div class="products">
                                             <h3 class="title">Checkout</h3>
                                             <div class="item">
-                                                <span class="price">{{ payment.amount }} XLM</span>
+                                                <span class="price">{{ payment.amount }} USD</span>
                                                 <p class="item-name">{{ item.name }}</p>
-                                                <p class="item-description">{{ shortIt(payment.description,25) }}</p>
+                                                <p class="item-description">{{ payment.description }}</p>
                                                 <p class="item-description" v-if="payment.description == '' || payment.description == undefined">Payment</p>
                                             </div>
                                             <div class="item">
-                                                <span class="price">{{ payment.fee }} XLM</span>
+                                                <span class="price">{{ payment.fee }} USD</span>
                                                 <p class="item-name">Fees</p>
                                                 <p class="item-description">Stellar network transaction fee</p>
                                             </div>
-                                            <div class="total">Total<span class="price">{{ payment.amount }} XLM</span></div>
+                                            <div class="total">Total<span class="price">{{ payment.amount }} USD</span></div>
                                         </div>
                                         <div class="card-details">
                                             <br>
@@ -73,9 +73,6 @@
                                                             <p v-if="active_currency.code != '' && active_currency.code != 'native'" style="font-size:12px">
                                                                 Conversion rate : {{ active_currency.rate }} per XLM
                                                                 <br> Issuer of asset : {{shortIt(active_currency.issuer,15) }}
-                                                            </p>
-                                                            <p v-if="active_currency.code == 'native'" style="font-size:18px">
-                                                                <br> Need to pay <b>{{ payment.amount }} XLM</b> to finish order.
                                                             </p>
                                                     </center>
                                                 </div>
@@ -126,9 +123,9 @@
                                             <i class="fa fa-exclamation-triangle" style="font-size:80px;color:red"></i>
                                             <br>
                                             <br>
-                                            <h3 style="font-size:25px">It looks like you weren’t to complete a transaction in time.
+                                            <h3 style="font-size:25px">It looks like you weren't to complete a transaction in time.
                     <br><br>
-                    If you believe there’s been a mistake, please contact us at <b>support@stellarpay.io</b> with the following order code:
+                    If you believe there's been a mistake, please contact us at <b>support@stellarpay.io</b> with the following order code:
                     <b>{{ fetchOrder.orderId }}</b></h3>
                                             <br>
                                             <div class="form-group col-sm-9">
@@ -146,7 +143,7 @@
                                             <br>
                                             <h3 style="font-size:35px">ORDER SUCCESSFULLY PAID</h3>
                                             <br>
-                                            <h4><a :href="'https://stellarchain.io/tx/' + fetchOrder.transactionId" target="_blank" style="font-size:13px;color:grey">Check Transaction</a></h4>
+                                            <h4><a :href="'https://stellarchain.io/tx/' + fetchOrder.transactionId" target="_blank" style="font-size:13px;color:grey">Check Transaction on StellarChain</a></h4>
                                             <div class="form-group col-sm-9">
                                                 <a :href="merchant.success">Return merchant's site</a>
                                             </div>
@@ -173,7 +170,7 @@
     <script src="assets/js/vue.js"></script>
     <script src="assets/js/axios.min.js"></script>
     <script src="assets/js/moment.min.js"></script>
-    <script src="assets/js/gateway.js"></script>
+    <script src="assets/js/shopify_gateway.js"></script>
     <script src="assets/js/clipboard.min.js"></script>
     <script type="text/javascript">
         new Clipboard('.btn-default');
