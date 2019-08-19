@@ -68,7 +68,7 @@
                                                     </center>
                                                     <center>
                                                         <p v-if="active_currency.code != '' && active_currency.code != 'native'" style="font-size:18px">
-                                                            <br> The asset automatically converted to XLM by merchant's rates. Accepting pay <b>{{ active_currency.calculated }} {{ active_currency.code }}</b> to finish order.
+                                                            <br> The asset automatically converted to XLM by merchant's rates. Accepting pay ≈ <b>{{ active_currency.calculated }} {{ active_currency.code }}</b> to finish order.
                                                             <br>
                                                             <p v-if="active_currency.code != '' && active_currency.code != 'native'" style="font-size:12px">
                                                                 Conversion rate : {{ active_currency.rate }} per XLM

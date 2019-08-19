@@ -41,6 +41,7 @@ var app = new Vue({
     fetchOrder : {},
     shopifyOrderId : '',
     api_server : 'https://api.stellarpay.io',
+    usdxlm: 0.1
   },
   created(){
     var prefix = this.$root
@@ -60,6 +61,7 @@ var app = new Vue({
         this.$root.merchant.acceptedCurrencies = JSON.parse(response.data.result[0].acceptedCurrencies)
         })
 
+    this.checkUSDXLM();
     this.checkShopifyStatus();
   },
   mounted(){
@@ -69,6 +71,14 @@ var app = new Vue({
     });
   },
   methods: {
+    checkUSDXLM(){
+          var prefix = this.$root
+      axios.get(prefix.api_server+'/api/prices/').then(response => {
+            prefix.usdxlm = response.data.USD_XLM
+            prefix.usdxlm -= response.data.USD_XLM*(5/100);
+            console.log(prefix.usdxlm)
+          })
+    },
     selectAsset(asset){
       $(".generated_icon").click(function(){
           $(".generated_icon").removeClass("active");
@@ -81,7 +91,7 @@ var app = new Vue({
         this.$root.active_currency.code = asset
         this.$root.active_currency.issuer = this.$root.merchant.acceptedCurrencies[asset]['issuer']
         this.$root.active_currency.rate = this.$root.merchant.acceptedCurrencies[asset]['rate']
-        this.$root.active_currency.calculated = (this.$root.payment.amount * this.$root.merchant.acceptedCurrencies[asset]['rate']).toFixed(7)
+        this.$root.active_currency.calculated = ( (this.$root.payment.amount / this.$root.usdxlm) / this.$root.merchant.acceptedCurrencies[asset]['rate']).toFixed(7)
       }
       this.$forceUpdate()
     },
